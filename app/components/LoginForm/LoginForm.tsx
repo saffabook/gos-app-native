@@ -13,7 +13,7 @@ const LoginForm = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title} testID="login-title">Login</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -28,7 +28,7 @@ const LoginForm = () => {
         onChangeText={setPassword}
       />
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
     </View>
   );
