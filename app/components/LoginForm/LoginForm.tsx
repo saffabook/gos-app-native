@@ -1,19 +1,44 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import axios from 'axios';
+import { API_URL } from '@env'; // Use environment variable
+
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Perform login logic here
-    console.log('Username:', username);
-    console.log('Password:', password);
+    
+
+    // Assume you have an API endpoint URL
+    const apiUrl = API_URL+'auth/login';
+    console.log(apiUrl);
+    // Data to send
+    const requestData = {
+        email: username,
+        password: password,
+    };
+
+    console.log(apiUrl);
+    
+    console.log(requestData);
+    // Make the API request
+    axios.post(apiUrl, requestData)
+    .then(response => {
+        console.log('API response:', response.data);
+        // Handle the response data here
+    })
+    .catch(error => {
+        console.error('API error:', error);
+        // Handle the error here
+    });
+
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title} testID="login-title">Login</Text>
+      <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
