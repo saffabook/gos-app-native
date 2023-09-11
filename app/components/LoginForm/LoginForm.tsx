@@ -1,19 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import axios from 'axios';
+import { API_URL } from '@env'; // Use environment variable
+
+
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null); // Initialize error state with type annotation
+  const [loading, setLoading] = useState(false); // Initialize loading state
+
 
   const handleLogin = () => {
-    // Perform login logic here
-    console.log('Username:', username);
-    console.log('Password:', password);
+    
+    const apiUrl = API_URL+'auth/login';
+    const requestData = {
+        email: username,
+        password: password,
+    };
+    setError(null);
+    setLoading(true);
+    axios.post(apiUrl, requestData).then(response => {
+      setLoading(false);
+    })
+    .catch(error => {
+      let errorMessage = 'There was an error loggin in';
+      if (error.response.data && error.response.data.error && error.response.data.error.message) {
+        errorMessage = error.response.data.error.message;
+      }
+      setLoading(false);
+      setError(errorMessage);
+    });
+
+   
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title} testID="login-title">Login</Text>
+      <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -27,9 +52,19 @@ const LoginForm = () => {
         value={password}
         onChangeText={setPassword}
       />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Submit</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color="blue" />
+      ) : (
+        <>
+          <TouchableOpacity testID="submitButton" style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+
+          {error && (
+            <Text testID="errorText" style={styles.errorText}>{error}</Text>
+          )}
+        </>
+      )}
     </View>
   );
 };
@@ -56,7 +91,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: '#9c27b0',
     width: '100%',
     height: 40,
     justifyContent: 'center',
@@ -66,6 +101,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    margin: 20,
+    fontSize: 16
   },
 });
 
