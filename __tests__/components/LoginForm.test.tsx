@@ -8,8 +8,6 @@ import axios from 'axios';
 
 const mockAxios = new MockAdapter(axios);
 
-
-
 describe('LoginForm component', () => {
 
   afterEach(() => {
@@ -76,7 +74,7 @@ describe('LoginForm component', () => {
   
   test('handles login error and displays error message', async () => {
     // Mock the axios.post request to simulate an error response
-    const errorMessage = 'There was an error loggin in';
+    const errorMessage = 'There was an error logging in';
     mockAxios.onPost(`auth/login`).reply(400, { error: { message: errorMessage } });
 
     const { getByTestId } = render(<LoginForm />);

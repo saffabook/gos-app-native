@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-interface LoggedOutHeaderProps {
+interface LoggedInHeaderProps {
     title: string;
 }
   
-const LoggedOutHeader: React.FC<LoggedOutHeaderProps>  = ({ title }) => {
+const LoggedInHeader: React.FC<LoggedInHeaderProps>  = ({ title }) => {
   return (
     <View style={styles.header}>
       <Text style={styles.headerText}>{title}</Text>
@@ -31,4 +31,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoggedOutHeader;
+export default LoggedInHeader;

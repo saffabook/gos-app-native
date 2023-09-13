@@ -2,15 +2,50 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { API_URL } from '@env'; // Use environment variable
+import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
+import AsyncStorage from '@react-native-async-storage/async-storage';// Define the type for the navigation prop
+type NavigationProps = {
+  navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
+};
 
 
+interface ApiResponse {
+  data: {
+    data: {
+      accessToken: string;
+    };
+  };
+}
 
-const LoginForm = () => {
+const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null); // Initialize error state with type annotation
   const [loading, setLoading] = useState(false); // Initialize loading state
 
+  const setPageError = (msg:string) => {
+    setLoading(false);
+    setError(msg);
+  }
+
+  const saveToken = async(response:ApiResponse) => {
+    
+    let tokenErrorMsg = 'Could not get an access token';
+
+    if (response && response.data && response.data.data && response.data.data.accessToken) {
+      try {
+        await AsyncStorage.setItem('token', response.data.data.accessToken);
+        setUsername('');
+        setPassword('');
+        navigation.navigate('Welcome');
+
+      } catch (error) {
+        setPageError(tokenErrorMsg);
+      }
+    } else {
+      setPageError(tokenErrorMsg);
+    } 
+  }
 
   const handleLogin = () => {
     
@@ -21,24 +56,24 @@ const LoginForm = () => {
     };
     setError(null);
     setLoading(true);
+    
     axios.post(apiUrl, requestData).then(response => {
       setLoading(false);
+      saveToken(response);
     })
     .catch(error => {
-      let errorMessage = 'There was an error loggin in';
+      let errorMessage = 'There was an error logging in';
       if (error.response.data && error.response.data.error && error.response.data.error.message) {
         errorMessage = error.response.data.error.message;
       }
-      setLoading(false);
-      setError(errorMessage);
+      setPageError(errorMessage);
     });
-
-   
   };
 
   return (
+
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>GOS login</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -52,6 +87,7 @@ const LoginForm = () => {
         value={password}
         onChangeText={setPassword}
       />
+          
       {loading ? (
         <ActivityIndicator size="large" color="blue" />
       ) : (
@@ -60,22 +96,23 @@ const LoginForm = () => {
             <Text style={styles.buttonText}>Submit</Text>
           </TouchableOpacity>
 
+      
           {error && (
             <Text testID="errorText" style={styles.errorText}>{error}</Text>
           )}
         </>
       )}
     </View>
+    
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    padding:20,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    marginTop:20
+    display: 'flex',
   },
   title: {
     fontSize: 24,
