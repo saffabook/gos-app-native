@@ -20,8 +20,8 @@ interface ApiResponse {
 const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null); // Initialize error state with type annotation
-  const [loading, setLoading] = useState(false); // Initialize loading state
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const setPageError = (msg:string) => {
     setLoading(false);
@@ -37,7 +37,7 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
         await AsyncStorage.setItem('token', response.data.data.accessToken);
         setUsername('');
         setPassword('');
-        navigation.navigate('Welcome');
+        navigation.navigate('NotificationFeed');
 
       } catch (error) {
         setPageError(tokenErrorMsg);
