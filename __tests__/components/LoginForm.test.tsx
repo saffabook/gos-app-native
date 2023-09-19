@@ -140,7 +140,7 @@ describe('LoginForm component', () => {
   });
 
 
-  it('handles incorrect login `', async () => {
+  it('handles error if both inputs not provided', async () => {
     
     const { getByPlaceholderText, getByTestId, queryByTestId } = render(<LoginForm />);
 
@@ -148,7 +148,6 @@ describe('LoginForm component', () => {
     const passwordInput = getByPlaceholderText('Password');
     const submitButton = getByTestId('submitButton');
 
-    //fireEvent.changeText(usernameInput, 'test@example.com');
     fireEvent.changeText(passwordInput, 'password');
 
     await act(async () => {
