@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-import { API_URL } from '@env'; // Use environment variable
+//import { API_URL } from '@env'; // Use environment variable
 import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
 import AsyncStorage from '@react-native-async-storage/async-storage';// Define the type for the navigation prop
+
+const API_URL='http://10.0.2.2:8080/api/'
 
 type NavigationProps = {
   navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
@@ -23,6 +25,8 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  let errorMessage = 'There was an error logging in';
+        
 
   const setPageError = (msg:string) => {
     setLoading(false);
@@ -48,10 +52,11 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
     } 
   }
 
-  const handleLogin = () => {
+  
+  const handleLogin = async () => {
     
     const apiUrl = API_URL+'auth/login';
-    
+
     const requestData = {
         email: username,
         password: password,
@@ -60,17 +65,24 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
     setError(null);
     setLoading(true);
   
-    axios.post(apiUrl, requestData).then(response => {
+    try {
+
+      const response = await axios.post(apiUrl, requestData);
       setLoading(false);
-      saveToken(response);
-    })
-    .catch(error => {
-      let errorMessage = 'There was an error logging in';
-      if (error.response.data && error.response.data.error && error.response.data.error.message) {
-        errorMessage = error.response.data.error.message;
+      
+      if (response.hasOwnProperty('data')) {
+        saveToken(response);
+      } else if (response.hasOwnProperty('error')) {
+        let errorResponse = response as any;
+        if (errorResponse.error.message) {
+          errorMessage = errorResponse.error.message;
+        }
       }
+
       setPageError(errorMessage);
-    });
+    } catch (error:any) {
+      setPageError(errorMessage);
+    }
   };
 
   return (

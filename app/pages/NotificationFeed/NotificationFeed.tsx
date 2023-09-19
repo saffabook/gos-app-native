@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { getNotificationIcon } from '../../services/IconService';
 import axios from 'axios';
 
-import { API_URL } from '@env'; // Use environment variable
+//import { API_URL } from '@env'; // Use environment variable
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface NotificationObject {
@@ -50,6 +50,8 @@ interface Link {
   active: boolean;
 }
 
+const API_URL='http://10.0.2.2:8080/api/'
+
 const NotificationFeed = () => {
 
   
@@ -60,23 +62,25 @@ const NotificationFeed = () => {
         
   useEffect(() => {
     // Define a function named retrieveData, which is asynchronous
+    
     const retrieveData = async () => {
       try {
         // Attempt to get the value associated with the key 'token' from AsyncStorage
         const value = await AsyncStorage.getItem('token');
-        
-        if (value !== null) {
+        if (value !== null && value.length > 0) {
           // Set the value retrieved from AsyncStorage in the component's state using setTokenValue
           setTokenValue(value);
         } else {
-          console.log('No token found 111');
+          setTokenValue('');
         }
       } catch (error) {
-        console.error(error);
+        //console.log('catch');
       }
     };
     // Call the retrieveData function when this effect is triggered (i.e., when the component mounts or when tokenData changes)
-    retrieveData();
+    if(tokenData.length === 0){
+      retrieveData();
+    }
   }, [tokenData]); // This effect will run whenever tokenData changes
 
   
@@ -85,18 +89,26 @@ const NotificationFeed = () => {
   // Ensure to check async data placement from setTokenValue is fired. (watch data is true)
   useEffect(() => {
     setNotifications([]);
-    if(tokenData.length > 0){
-      makeApiCall();
+    if(tokenData !== undefined){
+      if(tokenData.length > 0){
+        makeApiCall();
+      }
     }
-  }, [tokenData])
+  }, [tokenData]);
   
   const makeApiCall = async () => {
-    axios.post(apiUrl, {'token': tokenData}).then(response => {
-      setNotifications(response.data.data.data);
-    })
-    .catch(error => {
-      console.log(error);  
-    });
+
+    if (tokenData) {
+      try {
+
+        const response = await axios.post(apiUrl, { token: tokenData });
+        setNotifications(response.data.data.data);
+      } catch (error) {
+        //console.log(error);
+      }
+    } else {
+      //console.log('TokenData is undefined');
+    }
   };
 
   const renderNotification = ({ item }: { item: NotificationObject }) => {
