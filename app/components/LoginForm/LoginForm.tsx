@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
-//import { API_URL } from '@env'; // Use environment variable
+import { API_URL } from '@env'; // Use environment variable
 import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
 import AsyncStorage from '@react-native-async-storage/async-storage';// Define the type for the navigation prop
-
-const API_URL='http://10.0.2.2:8080/api/'
 
 type NavigationProps = {
   navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
 };
-
 
 interface ApiResponse {
   data: {
@@ -32,7 +29,6 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
     setLoading(false);
     setError(msg);
   }
-
 
   const saveToken = async(response:ApiResponse) => {
     

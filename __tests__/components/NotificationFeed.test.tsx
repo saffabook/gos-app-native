@@ -33,7 +33,7 @@ describe('LoginForm component', () => {
     
     AsyncStorage.getItem.mockResolvedValueOnce(mockToken);
 
-    const { getByText } = render(<NotificationFeed />); // Assuming you're rendering the component
+    const { getByText } = render(<NotificationFeed />);
 
     const mockedResponse = {
       data: {
@@ -42,6 +42,7 @@ describe('LoginForm component', () => {
         }
       }
     };
+
     // Mock the axios.post request to simulate a successful response
     jest.spyOn(axios, 'post').mockResolvedValue(mockedResponse);
 
@@ -56,8 +57,8 @@ describe('LoginForm component', () => {
     
     AsyncStorage.getItem.mockResolvedValueOnce(mockToken);
 
-    const { getByText } = render(<NotificationFeed />); // Assuming you're rendering the component
-  
+    const { getByText } = render(<NotificationFeed />);
+    
     const item = {
       id: 1,
       type: 'info',

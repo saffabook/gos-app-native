@@ -24,7 +24,6 @@ describe('LoginForm component', () => {
     const { getByTestId } = render(<LoginForm />);
     const submitButton = getByTestId('submitButton');
     
-    // Use the toBe matcher to assert the text content
     expect(submitButton).toBeTruthy(); // Check if the button exists
     expect(submitButton.props.children[0].props.children).toBe('Submit'); // Check the text content
   });

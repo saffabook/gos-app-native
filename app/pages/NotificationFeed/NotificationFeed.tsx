@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { getNotificationIcon } from '../../services/IconService';
 import axios from 'axios';
 
-//import { API_URL } from '@env'; // Use environment variable
+import { API_URL } from '@env'; // Use environment variable
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface NotificationObject {
@@ -50,8 +50,6 @@ interface Link {
   active: boolean;
 }
 
-const API_URL='http://10.0.2.2:8080/api/'
-
 const NotificationFeed = () => {
 
   
@@ -61,14 +59,12 @@ const NotificationFeed = () => {
 
         
   useEffect(() => {
-    // Define a function named retrieveData, which is asynchronous
     
     const retrieveData = async () => {
       try {
         // Attempt to get the value associated with the key 'token' from AsyncStorage
         const value = await AsyncStorage.getItem('token');
         if (value !== null && value.length > 0) {
-          // Set the value retrieved from AsyncStorage in the component's state using setTokenValue
           setTokenValue(value);
         } else {
           setTokenValue('');
@@ -77,7 +73,7 @@ const NotificationFeed = () => {
         //console.log('catch');
       }
     };
-    // Call the retrieveData function when this effect is triggered (i.e., when the component mounts or when tokenData changes)
+
     if(tokenData.length === 0){
       retrieveData();
     }
@@ -100,7 +96,6 @@ const NotificationFeed = () => {
 
     if (tokenData) {
       try {
-
         const response = await axios.post(apiUrl, { token: tokenData });
         setNotifications(response.data.data.data);
       } catch (error) {
