@@ -69,7 +69,7 @@ const NotificationFeed = () => {
           // Set the value retrieved from AsyncStorage in the component's state using setTokenValue
           setTokenValue(value);
         } else {
-          console.log('No token found');
+          console.log('No token found 111');
         }
       } catch (error) {
         console.error(error);
@@ -119,7 +119,7 @@ const NotificationFeed = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View testID="NotificationFeed" style={styles.container}>
       {notifications && notifications.length > 0? (
         <FlatList
           style={styles.scrollContainer}

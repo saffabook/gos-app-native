@@ -4,6 +4,7 @@ import axios from 'axios';
 import { API_URL } from '@env'; // Use environment variable
 import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
 import AsyncStorage from '@react-native-async-storage/async-storage';// Define the type for the navigation prop
+
 type NavigationProps = {
   navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
 };
@@ -28,10 +29,10 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
     setError(msg);
   }
 
+
   const saveToken = async(response:ApiResponse) => {
     
     let tokenErrorMsg = 'Could not get an access token';
-
     if (response && response.data && response.data.data && response.data.data.accessToken) {
       try {
         await AsyncStorage.setItem('token', response.data.data.accessToken);
@@ -50,13 +51,15 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
   const handleLogin = () => {
     
     const apiUrl = API_URL+'auth/login';
+    
     const requestData = {
         email: username,
         password: password,
     };
+
     setError(null);
     setLoading(true);
-    
+  
     axios.post(apiUrl, requestData).then(response => {
       setLoading(false);
       saveToken(response);

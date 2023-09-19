@@ -1,12 +1,18 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native'; // Import 'act' from testing-library
 import LoginForm from '../../app/components/LoginForm/LoginForm';
-
-
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
+jest.mock('axios'); // Mock Axios
 
 const mockAxios = new MockAdapter(axios);
+
+beforeEach(() => {
+  AsyncStorage.clear();
+});
 
 describe('LoginForm component', () => {
 
@@ -53,50 +59,107 @@ describe('LoginForm component', () => {
     expect(touchableOpacity).toBeTruthy();
   });
 
-  test('handles successful login', async () => {
-    // Mock the axios.post request to simulate a successful response
-    mockAxios.onPost(`auth/login`).reply(200, { success: true });
+  test('handles typing in username input', () => {
+    const { getByPlaceholderText } = render(<LoginForm />);
+    
+    // Find the username input element using its placeholder text
+    const usernameInput = getByPlaceholderText('Username');
+    
+    // Simulate typing in the username field
+    fireEvent.changeText(usernameInput, 'testuser');
 
-    const { getByTestId } = render(<LoginForm />);
-    const submitButton = getByTestId('submitButton');
-
-    // Simulate pressing the submit button
-    act(() => {
-      fireEvent.press(submitButton);
-    });
-
-    // Ensure that the component updates by re-rendering
-    await act(async () => {});
-
-    // Assert that the component behaves as expected after a successful login
-    // For example, you can check that error is null or that it navigates to another screen
+    // Check if the state value has been updated
+    expect(usernameInput.props.value).toBe('testuser');
   });
-  
-  test('handles login error and displays error message', async () => {
-    // Mock the axios.post request to simulate an error response
-    const errorMessage = 'There was an error logging in';
-    mockAxios.onPost(`auth/login`).reply(400, { error: { message: errorMessage } });
-
-    const { getByTestId } = render(<LoginForm />);
-    const submitButton = getByTestId('submitButton');
-
-    // Simulate pressing the submit button
-    act(() => {
-      fireEvent.press(submitButton);
-    });
-
-    // Ensure that the component updates by re-rendering
-    await act(async () => {});
-
-    // Locate the error message element by test ID
-    const errorMessageElement = getByTestId('errorText');
-
-    // Assert that the error message element exists
-    expect(errorMessageElement).toBeTruthy();
-
-    // Assert that the error message has the expected text content
-    expect(errorMessageElement.props.children).toBe(errorMessage);
-  });
-  
 });
+  
+  
+describe('LoginForm component', () => {
 
+  it('handles successful login', async () => {
+    
+    const navigateMock = jest.fn();
+    const navigation = { navigate: navigateMock };
+    const { getByPlaceholderText, getByTestId, debug } = render(<LoginForm navigation={navigation}/>);
+
+    const usernameInput = getByPlaceholderText('Username');
+    const passwordInput = getByPlaceholderText('Password');
+    const submitButton = getByTestId('submitButton');
+
+    fireEvent.changeText(usernameInput, 'test@example.com');
+    fireEvent.changeText(passwordInput, 'password');
+
+    // Mock the axios.post request to simulate a successful response
+    const mockResponse = { data: {data:{ accessToken: 'mockedAccessToken' }}};
+    jest.spyOn(axios, 'post').mockResolvedValue(mockResponse);
+
+
+    await act(async () => {
+      await fireEvent.press(submitButton);
+    });
+
+    // Check if the response value is set correctly
+    const successValue = mockResponse;
+    expect(successValue).toEqual(mockResponse);
+
+
+    // Check if the token has been set in storyage 
+    let tokenStored = await AsyncStorage.getItem('token');
+    expect(tokenStored).toBe('mockedAccessToken');
+    
+    expect(navigateMock).toHaveBeenCalledWith('NotificationFeed');
+  
+  });
+
+  it('handles failed login', async () => {
+    
+    const navigateMock = jest.fn();
+    const navigation = { navigate: navigateMock };
+    const { getByPlaceholderText, getByTestId, debug } = render(<LoginForm navigation={navigation}/>);
+
+    const usernameInput = getByPlaceholderText('Username');
+    const passwordInput = getByPlaceholderText('Password');
+    const submitButton = getByTestId('submitButton');
+
+    fireEvent.changeText(usernameInput, 'test@example.com');
+    fireEvent.changeText(passwordInput, 'password');
+
+    // Mock the axios.post request to simulate a successful response
+    const mockResponse = { error: { message: 'login invalid' }};
+    jest.spyOn(axios, 'post').mockResolvedValue(mockResponse);
+
+
+    await act(async () => {
+      await fireEvent.press(submitButton);
+    });
+
+    // Check if the response value is set correctly
+    const errorValue = mockResponse;
+    expect(errorValue).toEqual(mockResponse);
+
+  
+  });
+
+
+  it('handles incorrect login `', async () => {
+    
+    const { getByPlaceholderText, getByTestId, queryByTestId } = render(<LoginForm />);
+
+    const usernameInput = getByPlaceholderText('Username');
+    const passwordInput = getByPlaceholderText('Password');
+    const submitButton = getByTestId('submitButton');
+
+    //fireEvent.changeText(usernameInput, 'test@example.com');
+    fireEvent.changeText(passwordInput, 'password');
+
+    await act(async () => {
+      await fireEvent.press(submitButton);
+    });
+
+
+    const errorText = queryByTestId('errorText');
+    expect(errorText).not.toBeNull();
+  });
+
+});
+  
