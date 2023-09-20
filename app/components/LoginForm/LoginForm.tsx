@@ -68,6 +68,7 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
       
       if (response.hasOwnProperty('data')) {
         saveToken(response);
+        return;
       } else if (response.hasOwnProperty('error')) {
         let errorResponse = response as any;
         if (errorResponse.error.message) {

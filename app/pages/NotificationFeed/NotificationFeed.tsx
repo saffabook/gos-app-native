@@ -2,9 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { getNotificationIcon } from '../../services/IconService';
 import axios from 'axios';
+import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
 
 import { API_URL } from '@env'; // Use environment variable
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+type NavigationProps = {
+  navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
+};
 
 interface NotificationObject {
   id: number;
@@ -50,7 +55,8 @@ interface Link {
   active: boolean;
 }
 
-const NotificationFeed = () => {
+const NotificationFeed: React.FC<NavigationProps> = ({ navigation }) => {
+
 
   
   const [pageNumber, setPageNumber] = useState(1);
@@ -70,7 +76,7 @@ const NotificationFeed = () => {
           setTokenValue('');
         }
       } catch (error) {
-        //console.log('catch');
+        navigation.navigate('NotificationFeed');
       }
     };
 
@@ -97,19 +103,19 @@ const NotificationFeed = () => {
     if (tokenData) {
       try {
         const response = await axios.post(apiUrl, { token: tokenData });
-        setNotifications(response.data.data.data);
+        if (response && response.data && response.data.data && response.data.data.data) {
+          setNotifications(response.data.data.data);  
+        }
       } catch (error) {
-        //console.log(error);
+        navigation.navigate('Login');
       }
-    } else {
-      //console.log('TokenData is undefined');
     }
   };
 
   const renderNotification = ({ item }: { item: NotificationObject }) => {
     const icon = getNotificationIcon(item.type);
     return (
-      <View style={[styles.notification, item.seen ? styles.seenNotification : styles.unSeenNotification]}>
+      <View style={styles.notification}>
         <View style={styles.iconContainer}>
             <Text style={styles.icon}>{icon}</Text>
         </View>
@@ -135,15 +141,18 @@ const NotificationFeed = () => {
           renderItem={renderNotification}
         />
       ) : (
-        <Text>No notifications available</Text>
+        <Text style={styles.noNotifications}>No notifications available</Text>
       )}
   </View>
   );
 };
 
 const styles = StyleSheet.create({
-  testdiv:{
-
+  noNotifications:{
+    fontSize: 26,
+    textAlign: 'center',
+    marginTop: 100,
+    color: '#333', // Change the color to your preference
   },
   container: {
     flex: 1,
@@ -158,30 +167,32 @@ const styles = StyleSheet.create({
     display: 'flex',
     height:100
   },
+  
+  notificationList: {
+    flex:1,
+    borderColor: 'blue',
+    borderWidth: 10,
+  },
+  
   notification: {
+    
     padding: 16,
+    display:'flex',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    flexDirection: 'row'
   },
-    notificationList: {
-      flex:1,
-      borderColor: 'blue',
-      borderWidth: 10,
-    },
-    unSeenNotification: {
-      backgroundColor: '#f6e9f9',
-    },
-    seenNotification: {
-      backgroundColor: '#F5F5F5',
-    },
     iconContainer: {
+      flex: 20,
       marginRight: 10,
-    },
-    icon: {
-      fontSize: 20,
+      maxWidth:50, 
     },
     contentContainer: {
       flex: 1,
+      marginRight: 10,  
+    },
+    icon: {
+      fontSize: 30,
     },
     topRow: {
       flexDirection: 'row',

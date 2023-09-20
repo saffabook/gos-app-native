@@ -19,7 +19,7 @@ const RootStack = () =>{
                 initialRouteName='Login'
                 >
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-                <Stack.Screen name="NotificationFeed" component={NotificationFeed} options={{ title: 'GOS activity' }} // Set your custom title here
+                <Stack.Screen name="NotificationFeed" component={NotificationFeed} options={{ title: 'GOS notifications' }} // Set your custom title here
          />
             </Stack.Navigator>
         </NavigationContainer>
