@@ -2,14 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { getNotificationIcon } from '../../services/IconService';
 import axios from 'axios';
-import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
-
 import { API_URL } from '@env'; // Use environment variable
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type NavigationProps = {
-  navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
-};
 
 interface NotificationObject {
   id: number;
@@ -55,7 +50,7 @@ interface Link {
   active: boolean;
 }
 
-const NotificationFeed: React.FC<NavigationProps> = ({ navigation }) => {
+const NotificationFeed  = () => {
 
 
   
@@ -70,13 +65,13 @@ const NotificationFeed: React.FC<NavigationProps> = ({ navigation }) => {
       try {
         // Attempt to get the value associated with the key 'token' from AsyncStorage
         const value = await AsyncStorage.getItem('token');
-        if (value !== null && value.length > 0) {
-          setTokenValue(value);
-        } else {
-          setTokenValue('');
+        if(value !== undefined){
+          if (value !== null && value.length > 0) {
+            setTokenValue(value);
+          }
         }
       } catch (error) {
-        navigation.navigate('NotificationFeed');
+        console.log(error);
       }
     };
 
