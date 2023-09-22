@@ -3,12 +3,9 @@ import React from 'react';
 import LoggedOutHeader from '../../components/LoggedOutHeader/LoggedOutHeader'; 
 import LoginForm from '../../components/LoginForm/LoginForm'; 
 import { View } from 'react-native';
-
 import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
-
 import KeyboardAvoidingWrapper from '../../components/KeyboardAvoidingWrapper/KeyboardAvoidingWrapper';
 
-// Define the type for the navigation prop
 type NavigationProps = {
   navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
 };
@@ -16,14 +13,12 @@ type NavigationProps = {
 
 const Login: React.FC<NavigationProps> = ({ navigation }) => {
     return (
-        
-    <KeyboardAvoidingWrapper>
-        <View>
-            <LoggedOutHeader title="My App Header" />
-            <LoginForm navigation={navigation}/>
-        </View>
-        
-    </KeyboardAvoidingWrapper>
+        <KeyboardAvoidingWrapper>
+            <View>
+                <LoggedOutHeader title="My App Header" />
+                <LoginForm navigation={navigation}/>
+            </View>
+        </KeyboardAvoidingWrapper>
     );
 }
 

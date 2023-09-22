@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { API_URL } from '@env'; // Use environment variable
-import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
 import AsyncStorage from '@react-native-async-storage/async-storage';// Define the type for the navigation prop
+import { NavigationScreenProp } from 'react-navigation'; // Import the appropriate type
+
 type NavigationProps = {
   navigation: NavigationScreenProp<any, any>; // Adjust the generics as needed
 };
-
 
 interface ApiResponse {
   data: {
@@ -20,8 +20,10 @@ interface ApiResponse {
 const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null); // Initialize error state with type annotation
-  const [loading, setLoading] = useState(false); // Initialize loading state
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  let errorMessage = 'There was an error logging in';
+        
 
   const setPageError = (msg:string) => {
     setLoading(false);
@@ -31,13 +33,12 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
   const saveToken = async(response:ApiResponse) => {
     
     let tokenErrorMsg = 'Could not get an access token';
-
     if (response && response.data && response.data.data && response.data.data.accessToken) {
       try {
         await AsyncStorage.setItem('token', response.data.data.accessToken);
         setUsername('');
         setPassword('');
-        navigation.navigate('Welcome');
+        navigation.navigate('NotificationFeed');
 
       } catch (error) {
         setPageError(tokenErrorMsg);
@@ -47,27 +48,38 @@ const LoginForm: React.FC<NavigationProps> = ({ navigation }) => {
     } 
   }
 
-  const handleLogin = () => {
+  
+  const handleLogin = async () => {
     
     const apiUrl = API_URL+'auth/login';
+
     const requestData = {
         email: username,
         password: password,
     };
+
     setError(null);
     setLoading(true);
-    
-    axios.post(apiUrl, requestData).then(response => {
+  
+    try {
+
+      const response = await axios.post(apiUrl, requestData);
       setLoading(false);
-      saveToken(response);
-    })
-    .catch(error => {
-      let errorMessage = 'There was an error logging in';
-      if (error.response.data && error.response.data.error && error.response.data.error.message) {
-        errorMessage = error.response.data.error.message;
+      
+      if (response.hasOwnProperty('data')) {
+        saveToken(response);
+        return;
+      } else if (response.hasOwnProperty('error')) {
+        let errorResponse = response as any;
+        if (errorResponse.error.message) {
+          errorMessage = errorResponse.error.message;
+        }
       }
+
       setPageError(errorMessage);
-    });
+    } catch (error:any) {
+      setPageError(errorMessage);
+    }
   };
 
   return (

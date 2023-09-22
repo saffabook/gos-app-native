@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Login from '../pages/Login/Login';
-import Welcome from '../pages/Welcome/Welcome';
+import NotificationFeed from '../pages/NotificationFeed/NotificationFeed';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,7 +19,8 @@ const RootStack = () =>{
                 initialRouteName='Login'
                 >
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-                <Stack.Screen name="Welcome" component={Welcome} />
+                <Stack.Screen name="NotificationFeed" component={NotificationFeed} options={{ title: 'GOS notifications' }} // Set your custom title here
+         />
             </Stack.Navigator>
         </NavigationContainer>
     )
